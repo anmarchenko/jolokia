@@ -548,7 +548,15 @@ public class TypeHelper {
                 int idx = 0;
                 for (Map.Entry<String, Object> item : json.entrySet()) {
                     keys[idx] = item.getKey();
-                    types[idx++] = buildOpenType(null, item.getValue(), depth + 1, visited);
+                    OpenType<?> itemOpenType = buildOpenType(null, item.getValue(), depth + 1, visited);
+                    types[idx++] = itemOpenType;
+                    if (itemOpenType == null) {
+                        // we can't have an incomplete type. Perhaps we have an empty array, in which case
+                        // we don't know what is the item type?
+                        // It's better to return null for the entire CompositeType, so generic deserialization
+                        // will be used. See https://github.com/jolokia/jolokia/issues/976
+                        return null;
+                    }
                 }
 
                 CompositeType type = new CompositeType(JSONObject.class.getName(), JSONObject.class.getName(), keys, keys, types);
