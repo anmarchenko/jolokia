@@ -15,6 +15,16 @@
 ////
 == News
 
+=== Jolokia 2.5.1 released
+
+[.news-date]
+2026-02-18
+
+Just a tiny fix for `OpenType` information used in `jolokia-client-jmx-connector`. Now `JConsole` should be able to
+view CompositeData even if some items use unknown types.
+
+Refer to https://jolokia.org/changes-report.html#a2.5.1[changelog] and https://github.com/jolokia/jolokia/releases/tag/v2.5.1[GitHub release notes] for more details.
+
 === Jolokia 2.5.0 released
 
 [.news-date]

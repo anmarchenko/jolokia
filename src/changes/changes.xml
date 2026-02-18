@@ -23,6 +23,11 @@
     <author email="roland@jolokia.org">Roland Huß</author>
   </properties>
   <body>
+    <release version="2.5.1" description="Release 2.5.1" date="2026-02-18">
+      <action dev="ggrzybek" type="fix" issue="976">
+        Missing OpenType information for CompositeType items
+      </action>
+    </release>
     <release version="2.5.0" description="Release 2.5.0" date="2026-02-10">
       <action dev="ggrzybek" type="add" issue="974">
         ArtemisDetector should handle new groupId for Artemis
