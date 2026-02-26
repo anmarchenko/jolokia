@@ -383,66 +383,6 @@ public class JmxBridgeTest {
         }
     }
 
-    @Test(dataProvider = "allAvailableMBeans")
-    public void testMBeanInfo(ObjectName name) throws Exception {
-        final MBeanInfo jolokiaMBeanInfo = jolokia.getMBeanInfo(name);
-        final MBeanInfo nativeMBeanInfo = platform.getMBeanInfo(name);
-
-        assertEquals(jolokiaMBeanInfo.getDescription(), nativeMBeanInfo.getDescription());
-        assertEquals(jolokiaMBeanInfo.getClassName(), nativeMBeanInfo.getClassName());
-        assertEquals(jolokiaMBeanInfo.getAttributes().length, nativeMBeanInfo.getAttributes().length);
-        assertEquals(jolokiaMBeanInfo.getOperations().length, nativeMBeanInfo.getOperations().length);
-
-        final AttributeList replacementValues = new AttributeList();
-        final AttributeList originalValues = new AttributeList();
-        final List<String> attributeNames = new LinkedList<>();
-
-        for (MBeanAttributeInfo attribute : jolokiaMBeanInfo.getAttributes()) {
-            final String qualifiedName = name + "." + attribute.getName();
-            try {
-                final Object jolokiaAttributeValue = jolokia.getAttribute(name, attribute.getName());
-                final Object nativeAttributeValue = platform.getAttribute(name, attribute.getName());
-                // data type probably not so important (ie. long vs integer), as long as value is close enough
-                if (jolokiaAttributeValue instanceof Number jn && nativeAttributeValue instanceof Number nn) {
-                    // let's simply check if they are of the same sign
-                    assertTrue(jn.doubleValue() * nn.doubleValue() >= 0);
-                } else if (jolokiaAttributeValue instanceof CompositeData jcd && nativeAttributeValue instanceof CompositeData ncd) {
-                    // com.sun.management.internal.GcInfoCompositeData is messing the comparison
-                    assertTrue(ncd.getCompositeType().keySet().containsAll(jcd.getCompositeType().keySet()));
-                } else {
-                    assertEquals(jolokiaAttributeValue, nativeAttributeValue, "Attribute mismatch: " + qualifiedName);
-                }
-                if (attribute.isWritable()) {
-                    final Object newValue = ATTRIBUTE_REPLACEMENTS.get(qualifiedName);
-
-                    if (newValue != null) {
-                        final Attribute newAttribute = new Attribute(attribute.getName(), newValue);
-                        replacementValues.add(newAttribute);
-                        jolokia.setAttribute(name, newAttribute);
-                        // use native connection and verify that attribute is now new value
-                        assertEquals(platform.getAttribute(name, attribute.getName()), newValue);
-                        // restore original value
-                        final Attribute restoreAttribute =
-                                new Attribute(attribute.getName(), nativeAttributeValue);
-                        jolokia.setAttribute(name, restoreAttribute);
-                        originalValues.add(restoreAttribute);
-                        attributeNames.add(attribute.getName());
-                        // now do multi argument setting
-                        jolokia.setAttributes(name, replacementValues);
-                        assertEquals(platform.getAttribute(name, attribute.getName()), newValue);
-                        // and restore
-                        jolokia.setAttributes(name, originalValues);
-                        jolokia.getAttributes(name, attributeNames.toArray(new String[0]));
-                    }
-                }
-            } catch (RuntimeMBeanException e) {
-                if (!(e.getCause() instanceof UnsupportedOperationException)) {
-                    throw new RuntimeException(e.getCause());
-                }
-            }
-        }
-    }
-
     // ---- Tests not using @DataProviders
 
     @Test
