@@ -188,7 +188,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <reuseForks>false</reuseForks>
+          <!-- Keep the fixed JMX port bound by one JVM for the whole module. -->
+          <reuseForks>true</reuseForks>
           <forkCount>1</forkCount>
           <argLine>
             -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=45888 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost
