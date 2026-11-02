@@ -205,13 +205,33 @@
       </plugin>
 
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>${plugin.org.codehaus.mojo.build-helper-maven-plugin}</version>
+        <executions>
+          <execution>
+            <id>reserve-jmx-remote-port</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>reserve-network-port</goal>
+            </goals>
+            <configuration>
+              <portNames>
+                <portName>jmx.remote.port</portName>
+              </portNames>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
-          <reuseForks>false</reuseForks>
+          <reuseForks>true</reuseForks>
           <forkCount>1</forkCount>
           <argLine>
-            -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=45888 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost
+            -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=@{jmx.remote.port} -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Djava.rmi.server.hostname=localhost
             -Dcom.sun.management.jmxremote.serial.filter.pattern=java.lang.*;java.lang.reflect.Proxy;java.math.BigInteger;java.math.BigDecimal;java.util.*;javax.management.*;javax.management.modelmbean.*;javax.management.monitor.*;javax.management.openmbean.*;javax.management.relation.*;javax.management.remote.*;javax.management.remote.rmi.*;javax.management.timer.*;javax.rmi.ssl.*;java.rmi.MarshalledObject;java.rmi.dgc.*;java.rmi.server.*;javax.security.auth.Subject;org.jolokia.**;java.io.File;java.net.InetAddress;java.net.Inet4Address;java.net.Inet6Address;java.io.Serializable;java.time.*;!*
           </argLine>
           <systemPropertyVariables>
