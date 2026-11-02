@@ -272,7 +272,8 @@ abstract public class AbstractClientIntegrationTest {
     }
 
     public JolokiaTargetConfig getTargetProxyConfig() {
-        return new JolokiaTargetConfig("service:jmx:rmi:///jndi/rmi://localhost:45888/jmxrmi",null,null);
+        String jmxRemotePort = System.getProperty("com.sun.management.jmxremote.port", "45888");
+        return new JolokiaTargetConfig("service:jmx:rmi:///jndi/rmi://localhost:" + jmxRemotePort + "/jmxrmi",null,null);
     }
 
     private ServerConnector prepareHttpsConnector(Server jettyServer, int securePort, UriCompliance jolokiaCompliance) {
